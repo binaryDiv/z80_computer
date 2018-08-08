@@ -1,0 +1,11 @@
+RANDOM NOTES
+------------
+
+
+found this on: https://www.avrfreaks.net/forum/problems-programming-at28c256-eeprom-arduino
+
+Also, if you are designing the circuit yourself, the Z-80 requires pullups on the NMI and other pins. It's no a 'LS device. It took hours to figure that out.
+
+---
+
+
