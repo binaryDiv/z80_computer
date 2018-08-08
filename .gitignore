@@ -1,0 +1,8 @@
+# C code: object files etc.
+*.o
+*.obj
+*.elf
+*.hex
+*.gch
+*.pch
+
