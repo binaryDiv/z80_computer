@@ -1,0 +1,1 @@
+This is an EEPROM programmer, based on a ATmega16. For now(?) it only works with a parallel AT28C256 EEPROM chip. 

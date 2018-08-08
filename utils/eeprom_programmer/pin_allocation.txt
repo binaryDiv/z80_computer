@@ -1,0 +1,85 @@
+Microcontroller:
+- ATmega16 (32 IO-Pins)
+- available IO pins:
+	- PA0-7
+	- PB0-7 (including PB5-7 for ISP)
+	- PC0-7
+	- PD2-7 (PD0 and PD1 are UART pins)
+
+EEPROM:
+- Atmel AT28C256
+- IO and control pins:
+	- 8 data lines (I/O) D0-7
+	- 15 address lines A0-14
+	- inverted Chip Enable ~CE
+	- inverted Output Enable ~OE
+	- inverted Write Enable ~WE
+
+Usage
+-----
+- 1 microcontroller (µC), 1 EEPROM
+- direct parallel data IO
+
+Pin allocation
+--------------
+- on µC
+	- PC0-7 --> EEPROM address lines A0-7
+	- PB0-6 --> EEPROM address lines A8-14
+	- PA0-7 <-> EEPROM data lines D0-7
+	- PD0-1 <-> UART TX/RX
+	- PD2   --> EEPROM ~CE
+	- PD3   --> EEPROM ~OE
+	- PD4   --> EEPROM ~WE
+
+- on EEPROM
+	(see µC)
+
+
+Reading process
+---------------
+1. reset EEPROM control bits to [chip disabled, output disabled, write disabled]
+	PORTD2..4 = 111
+2. set data pins as inputs (without pullups - maybe disable pullups at all (PUD in SFIOR))
+	DDA0..7   = 00000000
+	PORTA0..7 = 00000000
+3. set address
+	PORTC0..7 = [Address bits 0..7]
+	PORTB0..6 = [Address bits 0..6]
+4. set EEPROM to read mode by enabling chip and output [chip enabled, output enabled, write disabled]
+	PORTD2..4 = 001
+5. wait ~150ns
+6. read byte from data pins
+	DATABYTE0..7 = PINA0..7
+7. reset control bits
+	PORTD2..4 = 111
+8. to read next byte, continue at step 3.
+
+
+Writing process
+---------------
+1. reset EEPROM control bits (see reading)
+	PORTD2..4 = 111
+2. set data pins as outputs (and reset output pins)
+	DDA0..7   = 11111111
+	PORTA0..7 = 00000000
+3. set address
+	PORTC0..7 = [Address bits 0..7]
+	PORTB0..6 = [Address bits 0..6]
+4. set control bits to latch address (falling edge)
+	PORTD2..4 = 010
+5. set data output to the value to be written
+	PORTA0..7 = WRITEBYTE0..7
+6. wait 50ns (data setup time)
+7. set control bits to latch data and start write cycle (rising edge)
+	PORTD2..4 = 111
+8. wait 50ns (pulse width)
+9. WAIT UNTIL WRITING IS FINISHED
+	(we can poll D7 to check if write cycle is finished - do we want to do that?)
+10. to write next byte, continue at step 3.
+
+
+Page writing
+------------
+/* TODO */
+
+
