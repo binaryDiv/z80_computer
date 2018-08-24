@@ -66,16 +66,23 @@ uint8_t uartGetLine(char* buffer, uint8_t maxLength) {
 		// Get next character
 		nextChar = uartGetChar();
 
+		// Skip trailing \n and \r
+		if (nextChar == '\n' || nextChar == '\r') {
+			if (readChars == 0) {
+				// Skip trailing \n and \r
+				continue;
+			}
+			else {
+				// End line (do not append the \r or \n to the buffer)
+				break;
+			}
+		}
+
 		// Write character to buffer
 		*buffer++ = nextChar;
 		
 		// Increment counter
 		readChars++;
-
-		// End reading on newline
-		if (nextChar == '\n' || nextChar == '\r') {
-			break;
-		}
 	}
 	
 	// Write a terminating '\0' byte
