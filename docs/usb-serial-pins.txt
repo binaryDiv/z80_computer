@@ -1,0 +1,14 @@
+USB-Seriell-Adapter:
+--------------------
+rot: 5V
+schwarz: GND
+weiß: RXD (am Adapter!!)
+grün: TXD (am Adapter!!)
+
+EEPROM-Programmer:
+------------------
+von links nach rechts:
+GND, 5V, TXD, RXD (am Programmer!!)
+= schwarz, rot, weiß, grün
+
+
