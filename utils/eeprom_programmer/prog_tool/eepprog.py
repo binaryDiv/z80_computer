@@ -2,19 +2,26 @@
 
 import sys
 import getopt
-# import serial
+import serial
 
 # Global variables for program parameters
 verbose = False
 serial_device = "/dev/ttyUSB0"
 serial_baudrate = 9600
+command = ""
+
+# Valid commands
+valid_commands = ("test")
 
 
 def usage():
     """Prints help text."""
 
     print(f"""
-Usage: {sys.argv[0]} [options]
+Usage: {sys.argv[0]} [OPTIONS] COMMAND [ARGS]
+
+Commands:
+  test                            first test command...
 
 Options:
   -h, --help                      show this help message and exit
@@ -28,7 +35,7 @@ def parse_args():
     """Parse command line arguments and set global variables."""
 
     # Global variables for program options (yes, yes, I know...)
-    global verbose, serial_device, serial_baudrate
+    global verbose, serial_device, serial_baudrate, command
 
     try:
         # Try to parse argument strings
@@ -43,7 +50,7 @@ def parse_args():
         usage()
         sys.exit(2)
 
-    # Parse all the arguments
+    # Parse all the options
     for opt, val in optlist:
         if opt == "-h" or opt == "--help":
             # Print help
@@ -52,22 +59,48 @@ def parse_args():
 
         elif opt == "-v" or opt == "--verbose":
             # Verbose
-            print("verbose!")
             verbose = True
 
         elif opt == "-d" or opt == "--device":
             # Set device filename
-            print("device: " + val)
             serial_device = val
 
         else:
             assert False, "unhandled option"
 
+    # Parse command argument
+    if len(args) == 0:
+        print("missing command\n")
+        usage()
+        sys.exit(2)
+    else:
+        command = args.pop(0)
+        if command not in valid_commands:
+            print("invalid command '" + command + "'\n")
+            usage()
+            sys.exit(2)
+
 
 def setup_serial():
     """Setup serial device."""
 
-    # TODO ...
+    if verbose:
+        print(f"setting up serial device '{serial_device}' with baudrate "
+              f"{serial_baudrate}")
+
+    # Setup serial device
+    ser = serial.Serial(serial_device, serial_baudrate, timeout=3)
+    return ser
+
+
+def command_test(ser):
+    """Command 'test': Does some testing."""
+
+    if verbose:
+        print("running command 'test' ...")
+
+    # Just read some stuff
+    print("read: ", ser.readline(20))
     pass
 
 
@@ -76,6 +109,18 @@ def main():
 
     # Parse program arguments
     parse_args()
+
+    # Setup serial device
+    ser = setup_serial()
+
+    # Run command
+    if command == "test":
+        command_test(ser)
+    else:
+        assert False, "unhandled command"
+
+    # Close serial device
+    ser.close()
 
 
 # Run program
