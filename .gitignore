@@ -6,3 +6,6 @@
 *.gch
 *.pch
 
+# vim swap files
+.*.swp
+
