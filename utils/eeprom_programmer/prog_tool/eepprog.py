@@ -89,7 +89,7 @@ def setup_serial():
               f"{serial_baudrate}")
 
     # Setup serial device
-    ser = serial.Serial(serial_device, serial_baudrate, timeout=3)
+    ser = serial.Serial(serial_device, serial_baudrate)
     return ser
 
 
@@ -99,9 +99,13 @@ def command_test(ser):
     if verbose:
         print("running command 'test' ...")
 
+    # Write a test command
+    # TODO do a HELLO first
+    ser.write(b"TESTREAD\n")
+
     # Just read some stuff
-    print("read: ", ser.readline(20))
-    pass
+    while True:
+        print("read: ", ser.readline(80))
 
 
 def main():
