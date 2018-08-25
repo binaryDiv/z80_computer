@@ -5,7 +5,8 @@
 #include "eeprom.h"
 
 #include <string.h>
-// #include <util/delay.h>
+#include <stdlib.h>
+#include <util/delay.h>
 
 // Reads, parses and executes next command
 void parseNextCommand() {
@@ -37,23 +38,45 @@ void parseNextCommand() {
 	else if(strcmp(buffer, "TESTREAD") == 0) {
 		// TESTREAD command: for testing purposes, reads a few bytes and
 		// returns them in a human readable format
-		// TODO ...
-		uartPutString("TESTREAD not implemented yet\r\n");
 
-		//uartPutString("Reading: ");
-		//byte = eepromReadByte(addr);
-		//itoa(byte, buffer, 16);
-		//uartPutString(buffer);
-		//uartPutString("\r\n");
-		//if (byte == 0) {
-		//	uartPutString("\r\n");
-		//	addr = 0x20;
-		//	_delay_ms(1000);
-		//	continue;
-		//}
-		//uartPutChar(byte);
+		uint8_t byte;
+		char outBuffer[20];
 
-		//addr++;
+		eepromSetReadMode();
+
+		for (int i = 0x00; i < 0x20; i++) {
+			itoa(i, outBuffer, 16);
+			uartPutString("TESTREAD 0x");
+			uartPutString(outBuffer);
+			uartPutString(": ");
+
+			byte = eepromReadByte(i);
+			itoa(byte, outBuffer, 16);
+
+			uartPutChar(byte);
+			uartPutString(" (0x");
+			uartPutString(outBuffer);
+			uartPutString(")\r\n");
+		}
+	}
+	else if(strcmp(buffer, "TESTWRITE") == 0) {
+		// TESTWRITE command: for testing purposes, writes a few bytes
+
+		char str[] = "Ohai world";
+		address_t addr = 0x00;
+
+		eepromSetWriteMode();
+
+		for (char* p = str; *p != '\0'; p++) {
+			eepromWriteByte(addr, *p);
+			//_delay_ms(100);
+			addr++;
+		}
+
+		// TODO necessary?
+		_delay_ms(100);
+
+		uartPutString("TESTWRITE success\r\n");
 	}
 	else {
 		// unknown command: return error message
