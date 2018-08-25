@@ -17,8 +17,8 @@ AVRDUDE_PROGRAMMER = usbtiny
 
 # Make target and object files
 TARGET = eepprog
-OBJECTS = main.o uart.o eeprom.o
-HEADERS = config.h BitIO.h uart.h eeprom.h
+OBJECTS = main.o uart.o eeprom.o protocol.o
+HEADERS = config.h BitIO.h uart.h eeprom.h protocol.h
 
 # Default target (build hex file)
 all: hex
