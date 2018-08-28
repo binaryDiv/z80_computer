@@ -42,7 +42,7 @@ def parse_args():
         optlist, args = getopt.gnu_getopt(
             sys.argv[1:],
             "hvd:",
-            ["help", "verbose", "device"]
+            ["help", "verbose", "device="]
         )
     except getopt.GetoptError as err:
         # Invalid option, print help and exit
@@ -74,11 +74,17 @@ def parse_args():
         usage()
         sys.exit(2)
     else:
+        # Get command and remove argument
         command = args.pop(0)
+
+        # Check if command is valid
         if command not in valid_commands:
             print("invalid command '" + command + "'\n")
             usage()
             sys.exit(2)
+
+        # Check if command has valid arguments
+        # TODO
 
 
 def setup_serial():
