@@ -8,6 +8,27 @@
 #include <stdlib.h>
 #include <util/delay.h>
 
+// Splits a command "CMD ARGS" to two strings "CMD" and "ARGS". Returns pointer
+// to "ARGS" or NULL if no arguments were found. Changes the input string!
+char* tokenizeCommand(char* cmd) {
+	if (cmd == NULL) {
+		return NULL;
+	}
+
+	// Search for a space character
+	for (char* p = cmd; *p != '\0'; p++) {
+		if (*p == ' ') {
+			// Split strings by replacing the space by \0, then return pointer
+			// to command arguments
+			*p++ = '\0';
+			return p;
+		}
+	}
+
+	// No space character found: command has no arguments, return NULL
+	return NULL;
+}
+
 // Reads, parses and executes next command
 void parseNextCommand() {
 	const int bufferLength = 80;
@@ -30,14 +51,35 @@ void parseNextCommand() {
 		return;
 	}
 
+	// Tokenize command
+	char* cmd = buffer;
+	char* args = tokenizeCommand(cmd);
+
 	// Parse command
-	if (strcmp(buffer, "HELLO") == 0) {
+	if (strcmp(cmd, "HELLO") == 0) {
 		// HELLO command: initializes connection
 		uartPutString("OHAI\r\n");
 	}
-	else if(strcmp(buffer, "TESTREAD") == 0) {
+	else if (strcmp(cmd, "READ") == 0) {
+		// READ command: takes a hex address or address range as argument,
+		// reads data and returns them in hexadecimal ASCII format.
+
+		// Check if arguments exist
+		if (args == NULL) {
+			uartPutString("ERROR READ needs an address\r\n");
+			return;
+		}
+
+		// Parse address(es)
+		// TODO
+		uartPutString(args);
+
+		// Read...
+		// TODO
+	}
+	else if (strcmp(cmd, "TESTREAD") == 0) {
 		// TESTREAD command: for testing purposes, reads a few bytes and
-		// returns them in a human readable format
+		// returns them in a human readable format.
 
 		uint8_t byte;
 		char outBuffer[20];
@@ -59,15 +101,21 @@ void parseNextCommand() {
 			uartPutString(")\r\n");
 		}
 	}
-	else if(strcmp(buffer, "TESTWRITE") == 0) {
+	else if (strcmp(cmd, "TESTWRITE") == 0) {
 		// TESTWRITE command: for testing purposes, writes a few bytes
 
 		char str[] = "Ohai world";
 		address_t addr = 0x00;
 
+		char* writeStr = str;
+		if (args != NULL) {
+			writeStr = args;
+		}
+
 		eepromSetWriteMode();
 
-		for (char* p = str; *p != '\0'; p++) {
+		// write input line instead of static string
+		for (char* p = writeStr; *p != '\0'; p++) {
 			eepromWriteByte(addr, *p);
 			//_delay_ms(100);
 			addr++;
